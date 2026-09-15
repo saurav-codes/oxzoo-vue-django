@@ -30,5 +30,5 @@ api_paths = ["/api", "/health"]
 
 [[domains]]
 name = "vue-django.oxzoo.sorv.dev"
-tls = false
+tls = true
 spa = true
