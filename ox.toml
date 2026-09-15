@@ -1,0 +1,34 @@
+name = "oxzoo-vue-django"
+branch = "main"
+runtime = "python"
+framework = "django"
+package_manager = "uv"
+port = 9108
+environment_file = "/etc/ox/apps/oxzoo-vue-django.env"
+required_packages = ["nodejs"]
+
+[[apt_sources]]
+name = "nodesource"
+url = "https://deb.nodesource.com/node_22.x"
+suite = "nodistro"
+components = ["main"]
+key_url = "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
+
+[[processes]]
+name = "web"
+command = "uv run gunicorn hello.wsgi:application --bind 127.0.0.1:{port} --workers 2"
+readiness = "http://127.0.0.1:{port}/health"
+
+[deploy]
+install = ["uv sync --frozen", "npm install"]
+build = ["npm", "run", "build"]
+health_url = "http://127.0.0.1:9108/health"
+
+[frontend]
+dist = "dist"
+api_paths = ["/api", "/health"]
+
+[[domains]]
+name = "vue-django.oxzoo.sorv.dev"
+tls = false
+spa = true
