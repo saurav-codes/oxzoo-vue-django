@@ -12,14 +12,42 @@ suite = "nodistro"
 components = ["main"]
 key_url = "https://deb.nodesource.com/gpgkey/nodesource-repo.gpg.key"
 
+# Host-shared postgres: the env's DATABASE_URL names this project's own database.
+[[services]]
+id = "postgres@17"
+
+# Host-shared redis: REDIS_URL and CELERY_BROKER_URL carry this project's own
+# index, so the heartbeat queue never collides with other projects.
+[[services]]
+id = "redis@7"
+
+# The celery worker and beat scheduler come from the catalog, never
+# hand-written [[processes]] worker blocks. hello/tasks.py registers the
+# every-60s heartbeat that celery-beat schedules.
+[[services]]
+id = "celery@5"
+
+[services.args]
+app = "hello"
+workers = 1
+queues = ["default"]
+
+[[services]]
+id = "celery-beat@5"
+
+[services.args]
+app = "hello"
+
 [[processes]]
 name = "web"
 command = "uv run gunicorn hello.wsgi:application --bind 127.0.0.1:{port} --workers 2"
+depends_on = ["postgres", "redis"]
 readiness = "http://127.0.0.1:{port}/health"
 
 [deploy]
 install = ["uv sync --frozen", "npm install"]
 build = ["npm", "run", "build"]
+migrate = ["uv run python manage.py migrate --noinput"]
 health_url = "http://127.0.0.1:9108/health"
 
 [frontend]
