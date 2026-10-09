@@ -1,6 +1,8 @@
 # oxzoo-vue-django
 
-Official [ox](https://github.com/saurav-codes/vps-ctl) deploy example: a Django 5.2 LTS JSON-free text API and a Vue 3 single-page app on one Ubuntu VPS, where nginx serves the built SPA statically and proxies `/api` and `/health` to gunicorn. The backend greets you with a tag from runtime env, the frontend bakes the same tag in at build time, so one variable demonstrates both environment flows. Four catalog services — postgres, redis, a celery worker, and celery beat — turn the same repo into a multi-service deploy: beat fires a heartbeat task every 60s, the worker writes one row per beat to postgres, and `/api/stats` returns the row count.
+Deployed with [ox](https://deploywithox.com): deploy a repo to your own server with one command, no Docker. [Docs](https://deploywithox.com/docs) · [Guide for this stack](https://deploywithox.com/docs/guides/django)
+
+Official [ox](https://deploywithox.com) deploy example: a Django 5.2 LTS JSON-free text API and a Vue 3 single-page app on one Ubuntu VPS, where nginx serves the built SPA statically and proxies `/api` and `/health` to gunicorn. The backend greets you with a tag from runtime env, the frontend bakes the same tag in at build time, so one variable demonstrates both environment flows. Four catalog services — postgres, redis, a celery worker, and celery beat — turn the same repo into a multi-service deploy: beat fires a heartbeat task every 60s, the worker writes one row per beat to postgres, and `/api/stats` returns the row count.
 
 ## Stack
 
