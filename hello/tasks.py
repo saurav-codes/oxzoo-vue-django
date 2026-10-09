@@ -12,7 +12,7 @@ def greeting_line() -> str:
 
 @shared_task
 def heartbeat():
-    # One row per beat tick in postgres; print() lands in the worker journal.
+    # One row per beat tick in postgres; print() lands in ox logs.
     from .models import Heartbeat
 
     row = Heartbeat.objects.create(line=greeting_line())

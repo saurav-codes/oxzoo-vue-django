@@ -5,12 +5,22 @@ import dj_database_url
 
 BASE_DIR = Path(__file__).resolve().parent.parent
 
-# Real deployments set DJANGO_SECRET_KEY in the ox env editor; the default keeps local runs working.
+# Deployments set DJANGO_SECRET_KEY as an ox variable (Generate on the review screen);
+# the default keeps local runs working.
 SECRET_KEY = os.environ.get("DJANGO_SECRET_KEY", "insecure-example-key")
 
 DEBUG = False
 
-ALLOWED_HOSTS = ["vue-django.oxzoo.sorv.dev", "127.0.0.1", "localhost"]
+# ox provides PUBLIC_HOST, the address the project serves. ALLOWED_HOSTS
+# (comma-separated) overrides it, for example to add a second domain.
+ALLOWED_HOSTS = [
+    host.strip()
+    for host in (
+        os.environ.get("ALLOWED_HOSTS")
+        or ",".join(filter(None, [os.environ.get("PUBLIC_HOST"), "127.0.0.1", "localhost"]))
+    ).split(",")
+    if host.strip()
+]
 
 INSTALLED_APPS = [
     "hello",
@@ -26,7 +36,7 @@ ROOT_URLCONF = "hello.urls"
 
 WSGI_APPLICATION = "hello.wsgi.application"
 
-# DATABASE_URL comes from the postgres service ox autowires. The sqlite
+# DATABASE_URL comes from the postgres service in ox.toml. The sqlite
 # fallback is local-dev convenience only: it exists just when DATABASE_URL
 # is unset, and ox always sets it.
 if os.environ.get("DATABASE_URL"):
@@ -39,7 +49,7 @@ else:
         }
     }
 
-# Broker and result backend ride the same local redis that ox autowires
+# Broker and result backend ride the project's redis from ox.toml
 # (REDIS_URL). CELERY_BROKER_URL overrides for custom setups; the 127.0.0.1
 # default covers running a worker on a dev machine without env.
 _broker_url = (
